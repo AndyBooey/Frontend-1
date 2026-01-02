@@ -4,7 +4,6 @@
   --form-bg: #ffffff;
 }
 
-
 .register-container {
   display: flex;
   flex-direction: column;
@@ -22,7 +21,7 @@
   padding: 40px;
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  width: 500px; 
+  width: 500px;
   max-width: 95%;
   text-align: center;
   transition: transform 0.3s;
@@ -32,7 +31,7 @@
   transform: translateY(-5px);
 }
 
-/* Logo at top of form */
+/* Logo */
 .register-logo {
   width: 100px;
   margin-bottom: 20px;
@@ -46,13 +45,45 @@
 }
 
 /* Inputs styling */
-.register-form input {
+.register-form input,
+.register-form select,
+.register-form button {
   width: 100%;
   padding: 12px;
   margin: 10px 0;
   border-radius: 8px;
-  border: 1px solid #ccc;
   font-size: 14px;
+  box-sizing: border-box;
+}
+
+.register-form input {
+  border: 1px solid #ccc;
+}
+
+.register-form button {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: background 0.3s;
+}
+
+.register-form button:hover {
+  background: var(--accent-color);
+}
+
+/* Inline error */
+.inline-error {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 4px;
+  text-align: left;
+}
+
+input.error {
+  border-color: #d32f2f;
 }
 
 /* Checkbox row */
@@ -69,26 +100,7 @@
   cursor: pointer;
 }
 
-/* Register button */
-.register-form button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 16px;
-  transition: background 0.3s;
-}
-
-.register-form button:hover {
-  background: var(--accent-color);
-}
-
-/* Login link */
+/* Links */
 .register-form .link-text {
   margin-top: 15px;
   font-size: 14px;
@@ -103,7 +115,6 @@
   text-decoration: underline;
 }
 
-/* T&C link inside checkbox */
 .tnc-link {
   color: var(--accent-color);
   text-decoration: underline;
@@ -115,13 +126,34 @@
   color: var(--primary-color);
 }
 
-/* Blur effect when modal is open */
+/* Age group styling */
+.age-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.age-option input[type="radio"] {
+  width: auto;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.age-group {
+  margin: 12px 0;
+  text-align: left;
+  font-size: 14px;
+}
+
+/* Modal */
 .blurred {
   filter: blur(3px);
   pointer-events: none;
 }
 
-/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -135,7 +167,6 @@
   z-index: 2000;
 }
 
-/* Modal box styling */
 .modal-box {
   background: #fff;
   width: 500px;
@@ -147,7 +178,6 @@
   animation: fadeIn 0.25s ease;
 }
 
-/* Scrollable modal content */
 .modal-content {
   max-height: 45vh;
   overflow-y: auto;
@@ -157,7 +187,6 @@
   line-height: 1.5;
 }
 
-/* Modal buttons (Agree + Close) */
 .modal-buttons {
   display: flex;
   justify-content: flex-end;
@@ -165,7 +194,6 @@
   margin-top: 20px;
 }
 
-/* Agree button */
 .agree-btn {
   background: var(--accent-color);
   padding: 10px 18px;
@@ -181,7 +209,6 @@
   background: var(--primary-color);
 }
 
-/* Close button */
 .close-btn {
   background: #ccc;
   padding: 10px 18px;
@@ -195,37 +222,35 @@
   background: #bbb;
 }
 
-/* Modal animation */
+/* Fade animation */
 @keyframes fadeIn {
   from { opacity: 0; transform: scale(0.95); }
   to { opacity: 1; transform: scale(1); }
 }
 
-/* Age group styling */
-.age-group {
-  margin: 12px 0;
-  text-align: left;
-  font-size: 14px;
-}
+/* Responsive tweaks for mobile */
+@media screen and (max-width: 480px) {
+  .register-form {
+    padding: 30px 20px;
+  }
 
-.age-label {
-  font-weight: bold;
-  color: var(--accent-color);
-}
+  .register-form h2 {
+    font-size: 24px;
+  }
 
-.age-option {
-  margin-right: 12px;
-  cursor: pointer;
-}
+  .register-form input,
+  .register-form select,
+  .register-form button {
+    font-size: 14px;
+    padding: 10px;
+  }
 
-/* marital status dropdown */
-.marital-select {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
-  background: white;
-  cursor: pointer;
+  .modal-box {
+    width: 95%;
+    padding: 20px;
+  }
+
+  .modal-content {
+    font-size: 13px;
+  }
 }

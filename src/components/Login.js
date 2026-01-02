@@ -5,8 +5,8 @@ import { withRouter } from "./withRouter";
 
 class Login extends Component {
 handleLogin = (e) => {
-e.preventDefault();
-window.location.href = "[https://www.creatingwings.org/](https://www.creatingwings.org/)";
+    e.preventDefault();
+    window.location.href = "https://www.creatingwings.org/";
 };
 
 
