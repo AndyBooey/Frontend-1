@@ -21,7 +21,7 @@
   padding: 40px;
   border-radius: 15px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  width: 500px;
+  width: 55%;
   max-width: 95%;
   text-align: center;
   transition: transform 0.3s;
@@ -33,8 +33,7 @@
 
 /* Logo */
 .register-logo {
-  width: 100px;
-  margin-bottom: 20px;
+  width: 25%;
 }
 
 /* Heading */
@@ -253,4 +252,22 @@ input.error {
   .modal-content {
     font-size: 13px;
   }
+}
+.field-label {
+  display: block;
+  text-align: left;
+  font-size: 13px;
+  margin-top: 10px;
+  color: #333;
+}
+
+.required {
+  color: #d32f2f;
+  margin-left: 2px;
+}
+.login-logo {
+  width: 65%;    
+  max-width: 300px;  
+  height: auto;
+  margin-bottom: 10px;
 }
