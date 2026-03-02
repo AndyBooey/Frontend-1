@@ -265,6 +265,14 @@ input.error {
   color: #d32f2f;
   margin-left: 2px;
 }
+
+.input-locked {
+  background-color: #f2f2f2;
+  color: #666;
+  border-color: #d0d0d0;
+  cursor: not-allowed;
+}
+
 .login-logo {
   width: 65%;    
   max-width: 300px;  

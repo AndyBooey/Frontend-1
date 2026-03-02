@@ -1,11 +1,15 @@
+//This page is displayed for users who log in through Auth0 and DO NOT have an account with CreatingWings
+
 import { Component } from "react";
 import { Link } from "react-router-dom";
-import { validatePassword, validateTerms } from "../utils/validators";
+import { validateTerms } from "../utils/validators";
 
 
 import "./dummy2_register.css";
 
 import termsText from "../assets/terms.txt";
+
+const AUTH_BASE = process.env.REACT_APP_AUTH_BACKEND_URL || "http://localhost:3000";
 
 class Registration extends Component {
   constructor(props) {
@@ -14,11 +18,8 @@ class Registration extends Component {
     this.state = {
       email: "",
       reEmail: "",
-      username: "",
-      password: "",
-      repassword: "",
       fullName: "",
-      ageRange: "",
+      is18OrOlder: false,   //changed to be 18 or older confirmation
       location: "",
       maritalStatus: "",
       incomeRange: "",
@@ -27,6 +28,8 @@ class Registration extends Component {
       acceptTerms: false,
       showTerms: false,
       termsContent: "",
+      ageError: "",
+      locationError: "",
       passwordError: "",
       termsError: "",
     };
@@ -42,16 +45,17 @@ class Registration extends Component {
     this.setState({ acceptTerms: e.target.checked });
   };
 
+  handleAgeCheckbox = (e) => {
+    this.setState({ is18OrOlder: e.target.checked });
+  };
+
 handleRegister = async (e) => {
   e.preventDefault(); 
 
   const {
     email,
-    username,
-    password,
-    repassword,
     fullName,
-    ageRange,
+    is18OrOlder,
     location,
     maritalStatus,
     incomeRange,
@@ -61,12 +65,11 @@ handleRegister = async (e) => {
   } = this.state;
 
   // Reset previous errors
-  this.setState({ passwordError: "", termsError: "" });
+  this.setState({ passwordError: "", termsError: "", ageError: "", locationError: "" });
 
-  // 1️⃣ Validate password
-  const passwordError = validatePassword(password, repassword);
-  if (passwordError) {
-    this.setState({ passwordError });
+  // 1️⃣ Validate age confirmation
+  if (!is18OrOlder) {
+    this.setState({ ageError: "You must be 18 or older to register." });
     return;
   }
 
@@ -77,25 +80,62 @@ handleRegister = async (e) => {
     return;
   }
 
-  // 3️⃣ Dummy LOCAL API call (placeholder)
-  // this is where you'd call your backend API to register the user
+  const locationPattern = /^[A-Za-z .'-]+,\s*[A-Za-z .'-]+$/;
+  if (!locationPattern.test(location.trim())) {
+    this.setState({ locationError: "Use format: City, State" });
+    return;
+  }
+
+  // added value maps so drpdown values match the Mongo schema enums
   try {
-    const response = await fetch("/api/register", {
+    const incomeMap = {
+      "0-9999": "$0-$9,999",
+      "10000-24999": "$10,000-$24,999",
+      "25000-49000": "$25,000-$49,999",
+      "50000-74999": "$50,000-$74,999",
+      "75000-99999": "$75,000-$99,999",
+      "100000-149999": "$100,000-$149,999",
+      "150000+": "$150,000+",
+    };
+
+    const educationMap = {
+      "Less than High School": "Less than High School",
+      "High School Diploma": "High School Diploma",
+      "Some College": "Some College, No Degree",
+      "Associate Degree": "Associate Degree",
+      Bachelors: "Bachelor's Degree",
+      Masters: "Master's Degree",
+      Doctoral: "Doctoral/Professional Degree",
+    };
+
+    const employmentMap = {
+      "Full-time": "Employed full-time",
+      "Part-time": "Employed part-time",
+      "Self-employed": "Self-employed",
+      Homemaker: "Homemaker",
+      Looking: "Looking for work",
+      Student: "Student",
+    };
+
+
+    //POST to backend happens here
+    // SENDS DATA TO BACKEND FOR MONGODB
+    const response = await fetch(`${AUTH_BASE}/api/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
+      //change request body fields to schema-compatible values (e.g. dropdowns) and only send non-empty optional fields
+      body: JSON.stringify({     
         email,
-        username,
-        password,        
         fullName,
-        ageRange,
         location,
-        maritalStatus,
-        incomeRange,
-        education,
-        employment,
+        maritalStatus: maritalStatus || null,
+        householdIncomeRange: incomeRange ? incomeMap[incomeRange] || null : null,
+        educationLevel: education ? educationMap[education] || null : null,
+        employmentStatus: employment ? employmentMap[employment] || null : null,
+        acceptedTerms: acceptTerms,
+        is18OrOlder,
       }),
     });
 
@@ -107,10 +147,8 @@ handleRegister = async (e) => {
     const data = await response.json();
     console.log("Registration success:", data);
 
-    // TEMP: frontend-only success behavior
-    alert("Registration successful (dummy API)");
-    // later: redirect or Auth0 login
-    // this.props.navigate("/login");
+    // Registration succeeded, send user to home page.
+    window.location.href = "https://www.creatingwings.org/";
 
   } catch (err) {
     console.error("Registration error:", err);
@@ -123,6 +161,17 @@ handleRegister = async (e) => {
 
 
   componentDidMount() {
+    const params = new URLSearchParams(window.location.search);
+    const emailFromAuth = params.get("email");
+    const fullNameFromAuth = params.get("fullName");
+
+    if (emailFromAuth || fullNameFromAuth) {
+      this.setState({
+        email: emailFromAuth || "",
+        fullName: fullNameFromAuth || "",
+      });
+    }
+
     fetch(termsText)
       .then((res) => res.text())
       .then((text) => this.setState({ termsContent: text }));
@@ -151,7 +200,7 @@ handleRegister = async (e) => {
         <div className={`register-container ${showTerms ? "blurred" : ""}`}>
           <div className="register-form">
             <img src="/logo.png" alt="Logo" className="register-logo" />
-            <h2>Registration</h2>
+            <h2>Profile</h2>
 
             <form onSubmit={this.handleRegister}>
               {/* Email */}
@@ -159,49 +208,13 @@ handleRegister = async (e) => {
                 Email <span className="required">*</span>
               </label>
               <input
-                type="email"
-                name="email"
-                required
-                value={this.state.email}
-                onChange={this.handleChange}
-              />
-
-              {/* Username */}
-              <label className="field-label">
-                Username <span className="required">*</span>
-              </label>
-              <input
-                type="text"
-                name="username"
-                required
-                value={this.state.username}
-                onChange={this.handleChange}
-              />
-
-              {/* Password */}
-              <label className="field-label">
-                Password <span className="required">*</span>
-              </label>
-              <input
-                type="password"
-                name="password"
-                required
-                minLength={8}
-                value={this.state.password}
-                onChange={this.handleChange}
-              />
-
-              {/* Re-enter Password */}
-              <label className="field-label">
-                Re-enter Password <span className="required">*</span>
-              </label>
-              <input
-                type="password"
-                name="repassword"
-                required
-                minLength={8}
-                value={this.state.repassword}
-                onChange={this.handleChange}
+              type="email"
+              name="email"
+              required
+              value={this.state.email}
+              onChange={this.handleChange}
+              readOnly
+              className="input-locked"
               />
               {/* PASSWORD ERROR MESSAGE */}
               {this.state.passwordError && (
@@ -216,30 +229,14 @@ handleRegister = async (e) => {
               {/* Full Name */}
               <label className="field-label">Full Name</label>
               <input
-                type="text"
-                name="fullName"
-                value={this.state.fullName}
-                onChange={this.handleChange}
+              type="text"
+              name="fullName"
+              value={this.state.fullName}
+              onChange={this.handleChange}
+              readOnly
+              className="input-locked"
               />
-
-              {/* Age Range */}
-              <label className="field-label">
-                Age Range <span className="required">*</span>
-              </label>
-              <select
-                name="ageRange"
-                required
-                value={this.state.ageRange}
-                onChange={this.handleChange}
-              >
-                <option value="Under 18">Under 18</option>
-                <option value="18-25">18–25</option>
-                <option value="26-35">26–35</option>
-                <option value="36-45">36–45</option>
-                <option value="46-55">46–55</option>
-                <option value="56+">56+</option>
-              </select>
-
+                                
               {/* Location */}
               <label className="field-label">
                 Location <span className="required">*</span>
@@ -249,9 +246,14 @@ handleRegister = async (e) => {
                 name="location"
                 required
                 placeholder="City, State"
+                pattern="^[A-Za-z .'-]+,\s*[A-Za-z .'-]+$"
+                title="Use format: City, State"
                 value={this.state.location}
                 onChange={this.handleChange}
               />
+              {this.state.locationError && (
+                <div className="inline-error">{this.state.locationError}</div>
+              )}
 
               {/* Marital Status */}
               <label className="field-label">Marital Status</label>
@@ -332,6 +334,19 @@ handleRegister = async (e) => {
                   </span><span className="required">*</span>
                 </label>
               </div>
+              <div className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={this.state.is18OrOlder}
+                  onChange={this.handleAgeCheckbox}
+                />
+                <label>
+                  I confirm I am 18 or older <span className="required">*</span>
+                </label>
+              </div>
+              {this.state.ageError && (
+                <div className="inline-error">{this.state.ageError}</div>
+              )}
 
               {/* Submit Button */}
               <button type="submit">Register</button>

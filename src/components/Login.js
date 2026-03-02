@@ -5,14 +5,29 @@ import "./dummy1_login.css";
 import { withRouter } from "./withRouter";
 
 // You can replace this with Auth0 SDK call
-const loginWithGoogle = () => {
+//const loginWithGoogle = () => {
     // DUMMY PLACEHOLDER
-    console.log("Calling Auth0 Google login...");
-    window.location.href = "/auth/google"; // placeholder
-};
+//    console.log("Calling Auth0 Google login...");
+//    window.location.href = "/auth/google"; // placeholder
+//};
+
+
+//------------------------------------------------------------------------
+// You can replace this with Auth0 SDK call
+const AUTH_BASE = process.env.REACT_APP_AUTH_BACKEND_URL;
+
+const loginWithGoogle = () => {
+    window.location.assign(
+        `${AUTH_BASE}/auth/login?connection=google-oauth2&returnTo=${encodeURIComponent("/post-login")}` //redirect to post-login route 
+        // after successful login, which will handle the logic of checking if user exists and redirecting to appropriate page
+
+    );
+}
+
+// ----------------------------------------------------------------------
 
 class Login extends Component {
-    handleLogin = (e) => {
+    handleLogin = (e) => {              
         e.preventDefault();
         // Legacy username/password flow (can be removed later)
         window.location.href = "https://www.creatingwings.org/";
@@ -26,7 +41,8 @@ class Login extends Component {
                     <h2>Login</h2>
 
                     <form onSubmit={this.handleLogin}>
-                        {/* Username */}
+                    {/*
+                    
                         <label className="field-label">Username</label>
                         <input
                             type="text"
@@ -34,7 +50,7 @@ class Login extends Component {
                             required
                         />
 
-                        {/* Password */}
+                       
                         <label className="field-label">Password</label>
 
                         <input
@@ -42,34 +58,30 @@ class Login extends Component {
                             name="password"
                             required
                         />
-
-                        <div className="forgot-password">
+                    */}
+                    
+                        {/* <div className="forgot-password">
                             <a href="#">Forgot password?</a>
-                        </div>
+                        </div> */}
+                        
 
 
-
-                        <button type="submit">Login</button>
+                        {/* <button type="submit">Login</button> */}
                     </form>
 
-                    <div className="or-divider">OR</div>
+                    {/*<div className="or-divider">OR</div>*/}
+
+                    
 
                     {/* Google Login Button */}
-                    <button
-                        className="google-login-button"
-                        onClick={loginWithGoogle}
-                    >
-                        <img
-                            src="/google-logo.png"
-                            alt=""
-                            className="google-icon"
-                        />
-                        Continue with Google
+                    <button className="google-login-button" onClick={loginWithGoogle}>
+                    <img src="/Google_logo.svn.png" alt="Google" className="google-icon" />
+                    <span>Continue with Google</span>
                     </button>
-
-                    <div className="link-text">
+                    
+                     {/* <div className="link-text">
                         New user? <Link to="/register">Click here to register</Link>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         );

@@ -114,3 +114,18 @@
 .forgot-password a:hover {
   text-decoration: underline;
 }
+
+.google-login-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* keeps text centered */
+}
+
+.google-icon {
+  position: absolute;
+  left: 24px;              /* move icon left */
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
